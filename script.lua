@@ -12,6 +12,7 @@ local l = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-
 -- toggles
 local minigun_aura_en = false
 local minigun_aura_conn = false
+local whitelist_friend_en = true
 
 -- setting
 local radius = 60
@@ -35,8 +36,10 @@ local function minigun_aura()
                 local p_hrp = other.Character.HumanoidRootPart
                 if (p_hrp.Position - hrp.Position).Magnitude <= radius then
                     if other.Character.Humanoid.Health ~= 0 then
-                        remote:InvokeServer(p_hrp.Position)
-                        task.wait()
+                        if not whitelist_friend_en or not me:IsFriendsWith(other.UserId) then
+                            remote:InvokeServer(p_hrp.Position)
+                            task.wait()
+                        end
                     end
                 end
             end
@@ -54,7 +57,11 @@ w:Button("Get minigun", function()
     me.PlayerGui.Select.Frame.RemoteEvent:FireServer("Minigun")
 end)
 
-w:Toggle("Minigun Aura", false, function(e) 
+w:Toggle("Whitelist friends", false, function(e) 
+    whitelist_friend_en = e
+end)
+
+w:Toggle("Minigun aura", false, function(e) 
     minigun_aura_en = e
     if minigun_aura_en then
         minigun_aura_conn = rs.Heartbeat:Connect(function()
