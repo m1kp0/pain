@@ -61,18 +61,16 @@ w:Toggle("Anti death", false, function(e)
         if me.Character ~= nil and anti_death_en then
             hrp = me.Character.HumanoidRootPart
             local old_pos = hrp.Position.Y
+            hrp.CFrame = CFrame.new(hrp.Position.X, 100, hrp.Position.Z)
+            task.wait(0.1)
             hrp.CFrame = CFrame.new(hrp.Position.X + 50, 100, hrp.Position.Z)
             task.wait(0.1)
-            hrp.CFrame = CFrame.new(hrp.Position.X - 50, old_pos, hrp.Position.Z)
-            task.wait(0.0001)
-            hrp.CFrame = CFrame.new(hrp.Position.X, 150, hrp.Position.Z + 50)
+            hrp.CFrame = CFrame.new(hrp.Position.X, 50, hrp.Position.Z)
             task.wait(0.1)
-            hrp.CFrame = CFrame.new(hrp.Position.X, 50, hrp.Position.Z - 50)
-            task.wait(0.0001)
-            hrp.CFrame = CFrame.new(hrp.Position.X - 30, 100, hrp.Position.Z + 30)
+            hrp.CFrame = CFrame.new(hrp.Position.X - 50, 50, hrp.Position.Z)
             task.wait(0.1)
-            hrp.CFrame = CFrame.new(hrp.Position.X + 30, old_pos, hrp.Position.Z - 30)
-            task.wait(0.0001)
+            hrp.CFrame = CFrame.new(hrp.Position.X, old_pos, hrp.Position.Z)
+            task.wait()
         end
         task.wait()
     end
