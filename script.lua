@@ -4,7 +4,7 @@ print("Loading..")
 local others = game:GetService("Players")
 local rs = game:GetService("RunService")
 local me = others.LocalPlayer
-local char, hum, hrp, minigun, remote
+local char, hum, hrp, minigun, remote, letsgo
 
 -- ui library
 local l = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/turtle"))()
@@ -12,6 +12,7 @@ local l = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-
 -- toggles
 local minigun_aura_en = false
 local minigun_aura_conn = false
+local anti_death_en = false
 
 -- setting
 local radius = 60
@@ -34,8 +35,8 @@ local function minigun_aura()
             if other ~= me and other.Character ~= nil then
                 local p_hrp = other.Character.HumanoidRootPart
                 if (p_hrp.Position - hrp.Position).Magnitude <= radius then
-                    if other.Character.Humanoid.Health ~= 0 then
-                        remote:InvokeServer(p_hrp.Position)
+                    if other.Character.Humanoid.Health ~= 0 and not other.Character:FindFirstChild("ForceField") then
+                        remote:InvokeServer(p_hrp.Position + p_hrp.Velocity/3.5)
                         task.wait()
                     end
                 end
@@ -52,6 +53,29 @@ local w = l:Window("Pain")
 
 w:Button("Get minigun", function()
     me.PlayerGui.Select.Frame.RemoteEvent:FireServer("Minigun")
+end)
+
+w:Toggle("Anti death", false, function(e) 
+    anti_death_en = e
+    while anti_death_en do
+        if me.Character ~= nil and anti_death_en then
+            hrp = me.Character.HumanoidRootPart
+            local old_pos = hrp.Position.Y
+            hrp.CFrame = CFrame.new(hrp.Position.X + 50, 100, hrp.Position.Z)
+            task.wait(0.1)
+            hrp.CFrame = CFrame.new(hrp.Position.X - 50, old_pos, hrp.Position.Z)
+            task.wait(0.0001)
+            hrp.CFrame = CFrame.new(hrp.Position.X, 150, hrp.Position.Z + 50)
+            task.wait(0.1)
+            hrp.CFrame = CFrame.new(hrp.Position.X, 50, hrp.Position.Z - 50)
+            task.wait(0.0001)
+            hrp.CFrame = CFrame.new(hrp.Position.X - 30, 100, hrp.Position.Z + 30)
+            task.wait(0.1)
+            hrp.CFrame = CFrame.new(hrp.Position.X + 30, old_pos, hrp.Position.Z - 30)
+            task.wait(0.0001)
+        end
+        task.wait()
+    end
 end)
 
 w:Toggle("Minigun aura", false, function(e) 
