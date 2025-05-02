@@ -91,7 +91,7 @@ w:Toggle("Minigun aura", false, function(e)
     end
 end)
 
-w:Slider("aura radius",0,300,60, function(value)
+w:Slider("aura radius",0,500,60, function(value)
     radius = value
 end)
 
