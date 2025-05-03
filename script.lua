@@ -4,7 +4,7 @@ print("Loading..")
 local others = game:GetService("Players")
 local rs = game:GetService("RunService")
 local me = others.LocalPlayer
-local char, hum, hrp, minigun, remote, letsgo
+local char, hum, hrp, remote
 
 -- ui library
 local l = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/turtle"))()
@@ -13,6 +13,7 @@ local l = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-
 local minigun_aura_en = false
 local minigun_aura_conn = false
 local anti_death_en = false
+local dash_anim_en = false
 
 -- setting
 local radius = 60
@@ -20,28 +21,31 @@ local radius = 60
 -- function
 local function minigun_aura()
     if me.Character ~= nil then
-        hrp = me.Character.HumanoidRootPart
-        if me.Character:FindFirstChild("Minigun") then
-            minigun = workspace:FindFirstChild(me.Name).Minigun
-        else
-            return
-        end
-        if minigun then
-            remote = minigun.RemoteFunction
-        else
-            return
-        end
-        for i, other in pairs(others:GetPlayers()) do
-            if other ~= me and other.Character ~= nil then
-                local p_hrp = other.Character.HumanoidRootPart
-                if (p_hrp.Position - hrp.Position).Magnitude <= radius then
-                    if other.Character.Humanoid.Health ~= 0 and not other.Character:FindFirstChild("ForceField") then
-                        remote:InvokeServer(p_hrp.Position + p_hrp.Velocity/3.5)
-                        task.wait()
+        pcall(function()
+            hrp = me.Character.HumanoidRootPart
+            local minigun
+            if me.Character:FindFirstChild("Minigun") then
+                minigun = workspace:FindFirstChild(me.Name).Minigun
+            else
+                return
+            end
+            if minigun then
+                remote = minigun.RemoteFunction
+            else
+                return
+            end
+            for i, other in pairs(others:GetPlayers()) do
+                if other ~= me and other.Character ~= nil then
+                    local p_hrp = other.Character.HumanoidRootPart
+                    if (p_hrp.Position - hrp.Position).Magnitude <= radius and p_hrp.Position.Y < 500 then
+                        if other.Character.Humanoid.Health ~= 0 and not other.Character:FindFirstChild("ForceField") then
+                            remote:InvokeServer(p_hrp.Position + p_hrp.Velocity/5)
+                            task.wait()
+                        end
                     end
                 end
             end
-        end
+        end)
     else
         return
     end
@@ -57,22 +61,26 @@ end)
 
 w:Toggle("Anti death", false, function(e) 
     anti_death_en = e
-    while anti_death_en do
+    if anti_death_en then
         if me.Character ~= nil and anti_death_en then
             hrp = me.Character.HumanoidRootPart
             local old_pos = hrp.Position.Y
-            hrp.CFrame = CFrame.new(hrp.Position.X, 100, hrp.Position.Z)
-            task.wait(0.1)
-            hrp.CFrame = CFrame.new(hrp.Position.X + 50, 100, hrp.Position.Z)
-            task.wait(0.1)
-            hrp.CFrame = CFrame.new(hrp.Position.X, 50, hrp.Position.Z)
-            task.wait(0.1)
-            hrp.CFrame = CFrame.new(hrp.Position.X - 50, 50, hrp.Position.Z)
-            task.wait(0.1)
-            hrp.CFrame = CFrame.new(hrp.Position.X, old_pos, hrp.Position.Z)
-            task.wait()
+            while anti_death_en do
+                pcall(function()
+                    hrp.CFrame = CFrame.new(hrp.Position.X, 100, hrp.Position.Z + 50)
+                    task.wait(0.1)
+                    hrp.CFrame = CFrame.new(hrp.Position.X + 50, 100, hrp.Position.Z)
+                    task.wait(0.1)
+                    hrp.CFrame = CFrame.new(hrp.Position.X, 50, hrp.Position.Z)
+                    task.wait(0.1)
+                    hrp.CFrame = CFrame.new(hrp.Position.X - 50, 50, hrp.Position.Z)
+                    task.wait(0.1)
+                    hrp.CFrame = CFrame.new(hrp.Position.X, old_pos, hrp.Position.Z - 50)
+                    task.wait()
+                end)
+                task.wait()
+            end
         end
-        task.wait()
     end
 end)
 
@@ -82,14 +90,30 @@ w:Toggle("Minigun aura", false, function(e)
         minigun_aura_conn = rs.Heartbeat:Connect(function()
             minigun_aura()
         end)
-    else
-        if minigun_aura_conn ~= nil then
-            minigun_aura_conn:Disconnect()
-        end
+    elseif minigun_aura_conn then
+        minigun_aura_conn:Disconnect()
     end
 end)
 
-w:Slider("aura radius",0,500,60, function(value)
+w:Toggle("Dash animation", false, function(e) 
+    dash_anim_en = e
+    if me.Character ~= nil and dash_anim_en then
+        me.Character.Humanoid.WalkSpeed = 40
+        dash_anim = Instance.new("Animation")
+        dash_anim.AnimationId = "rbxassetid://6237974108"
+        dash_animer = game.Players.LocalPlayer.Character:FindFirstChild("Humanoid"):FindFirstChild("Animator")
+        dash_anim_track = dash_animer:LoadAnimation(dash_anim)
+        while dash_anim_en do
+            task.wait(0.2)
+            dash_anim_track:Play()
+        end
+    else
+        dash_anim_track:Stop()
+        me.Character.Humanoid.WalkSpeed = 16
+    end
+end)
+
+w:Slider("Aura radius",0,500,60, function(value)
     radius = value
 end)
 
