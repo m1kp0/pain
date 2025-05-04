@@ -44,7 +44,7 @@ local function minigun_aura()
                     local p_hrp = other.Character.HumanoidRootPart
                     if (p_hrp.Position - hrp.Position).Magnitude <= radius and p_hrp.Position.Y < 500 then
                         if other.Character.Humanoid.Health ~= 0 and not other.Character:FindFirstChild("ForceField") then
-                            remote:InvokeServer(p_hrp.Position + p_hrp.Velocity/5)
+                            remote:InvokeServer(p_hrp.Position + p_hrp.Velocity/3.5)
                             task.wait()
                         end
                     end
