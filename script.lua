@@ -5,7 +5,7 @@ print("Loading..")
     local rs = game:GetService("RunService")
     local debris = game:GetService("Debris")
     local me = others.LocalPlayer
-    local char, hum, hrp, remote
+    local char, hum, hrp, remote, anim
 
 -- ui library
     local l = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/turtle"))()
@@ -30,59 +30,20 @@ print("Loading..")
             pcall(function()
                 hrp = me.Character.HumanoidRootPart
                 local minigun
-                if me.Character:FindFirstChild("Minigun") then
-                    minigun = workspace:FindFirstChild(me.Name).Minigun
-                else
-                    return
-                end
-                if minigun then
-                    remote = minigun.RemoteFunction
-                else
-                    return
-                end
+                if me.Character:FindFirstChild("Minigun") then minigun = workspace:FindFirstChild(me.Name).Minigun else return end
+                if minigun then remote = minigun.RemoteFunction else return end
                 for i, other in pairs(others:GetPlayers()) do
                     if other ~= me and other.Character ~= nil then
                         local p_hrp = other.Character.HumanoidRootPart
                         if (p_hrp.Position - hrp.Position).Magnitude <= radius and p_hrp.Position.Y < 500 then
                             if other.Character.Humanoid.Health ~= 0 and not other.Character:FindFirstChild("ForceField") then
-                                remote:InvokeServer(p_hrp.Position + p_hrp.Velocity/5)
-                                task.wait()
+                                remote:InvokeServer(p_hrp.Position + p_hrp.Velocity/5); task.wait()
                             end
                         end
                     end
                 end
             end)
-        else
-            return
-        end
-        task.wait()
-    end
-
-    local function anti_decoy_c4_aura()
-        if me.Character ~= nil then
-            pcall(function()
-                hrp = me.Character.HumanoidRootPart
-                local mine
-                for i, mine in pairs(workspace:GetChildren()) do
-                    if mine.Name == "C4" or mine.Name == "Decoy" then
-                        local mine_pos = mine.Handle.Position
-                        if (mine_pos - hrp.Position).Magnitude <= 30 then
-                            for i, v in pairs(mine:GetDescendants()) do
-                                if v:IsA("Part") or v:IsA("MeshPart") then
-                                    v.Massless = true
-                                end
-                            end
-                            for i = 1, 20 do
-                                mine.Handle.CFrame = mine.Handle.CFrame * CFrame.new(1, 5, 1)
-                            end
-                        end
-                    end
-                end
-            end)
-        else
-            return
-        end
-        task.wait()
+        else return end; task.wait()
     end
 
 -- gui
@@ -91,27 +52,19 @@ print("Loading..")
     local w3 = l:Window("Fun")
 
     w:Button("Get minigun", function()
-        me.PlayerGui.Select.Frame.RemoteEvent:FireServer("Minigun")
+        me.PlayerGui.Select.Frame.RemoteEvent:FireServer("Minigun"); task.wait(.1)
+        me.PlayerGui.Select.Frame.RemoteEvent:FireServer("Spear")
     end)
 
     w:Toggle("Minigun aura", false, function(e) 
-        minigun_aura_en = e
-        if minigun_aura_en then
-            minigun_aura_conn = rs.Heartbeat:Connect(function()
-                minigun_aura()
-            end)
-        elseif minigun_aura_conn then
-            minigun_aura_conn:Disconnect()
-        end
+        minigun_aura_en = e; if minigun_aura_en then minigun_aura_conn = rs.Heartbeat:Connect(function() minigun_aura() end)
+        elseif minigun_aura_conn then minigun_aura_conn:Disconnect() end
     end)
 
-    w:Slider("Aura radius",0,500,60, function(value)
-        radius = value
-    end)
+    w:Slider("Aura radius",0,500,60, function(value) radius = value end)
 
     w2:Toggle("Anti death", false, function(e) 
-        anti_death_en = e
-        if anti_death_en then
+        anti_death_en = e; if anti_death_en then
             if me.Character ~= nil and anti_death_en then
                 hrp = me.Character.HumanoidRootPart
                 local old_pos = hrp.Position.Y
@@ -127,21 +80,9 @@ print("Loading..")
                         task.wait(0.1)
                         hrp.CFrame = CFrame.new(hrp.Position.X, old_pos, hrp.Position.Z - 50)
                         task.wait()
-                    end)
-                    task.wait()
+                    end); task.wait()
                 end
             end
-        end
-    end)
-
-    w2:Toggle("TP c4-decoy away laggy", false, function(e) 
-        anti_decoy_c4_en = e
-        if anti_decoy_c4_en then
-            anti_decoy_c4_conn = rs.RenderStepped:Connect(function()
-                anti_decoy_c4_aura()
-            end)
-        elseif anti_decoy_c4_conn then
-            anti_decoy_c4_conn:Disconnect()
         end
     end)
 
@@ -158,8 +99,7 @@ print("Loading..")
     end)
 
     w3:Toggle("Loop dash", false, function(e) 
-        dash_anim_en = e
-        if me.Character ~= nil and dash_anim_en then
+        dash_anim_en = e; if me.Character ~= nil and dash_anim_en then
             dash_anim = Instance.new("Animation")
             dash_anim.AnimationId = "rbxassetid://6237974108"
             dash_animer = game.Players.LocalPlayer.Character:FindFirstChild("Humanoid"):FindFirstChild("Animator")
@@ -172,8 +112,7 @@ print("Loading..")
                         local hrp = me.Character.HumanoidRootPart
                         local hum = me.Character.Humanoid
                         hum.PlatformStand = false
-                        hrp.CFrame = hrp.CFrame * CFrame.new(0, 0, -1)
-                        rs.RenderStepped:Wait()
+                        hrp.CFrame = hrp.CFrame * CFrame.new(0, 0, -1); rs.RenderStepped:Wait()
                     end
                 end)
             end
