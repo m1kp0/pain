@@ -104,16 +104,11 @@ print("Loading..")
             dash_anim.AnimationId = "rbxassetid://6237974108"
             dash_animer = game.Players.LocalPlayer.Character:FindFirstChild("Humanoid"):FindFirstChild("Animator")
             dash_anim_track = dash_animer:LoadAnimation(dash_anim)
+            me.Character.Humanoid.WalkSpeed = 50
             while dash_anim_en do
                 pcall(function()
-                    task.wait(0.01)
+                    task.wait(0.2)
                     dash_anim_track:Play()
-                    for _ = 1, 20 do
-                        local hrp = me.Character.HumanoidRootPart
-                        local hum = me.Character.Humanoid
-                        hum.PlatformStand = false
-                        hrp.CFrame = hrp.CFrame * CFrame.new(0, 0, -1); rs.RenderStepped:Wait()
-                    end
                 end)
             end
         else
